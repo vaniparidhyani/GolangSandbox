@@ -1,0 +1,7 @@
+Eash time we declare a variable, memory gets allocated. If we declare a variable within a function and if we call that function 100times then 100 memory space will get allocated.. This can cause memory issues and hence we must deallocate space as well!
+Variables declared within a function are stored in Stack memory while variables which are declared globally within the program get stored in Heap Memory.
+Local variables are stored in Stack and it gets deallocated after a function completes. Whereas data in heap memory stays unless deallocated by us explicitly. Heap is persistent.
+
+
+Deciding when to explicitly deallocate space is a complex thing hence Go has GarbageCollection. It happends inherently and developers dont have to determine it. GC slows things a little bit since it happens in the background but is benefecial for big/complex programs.
+

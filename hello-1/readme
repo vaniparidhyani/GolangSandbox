@@ -1,0 +1,6 @@
+The main.go prints hello world.
+To compile the program we first run: go build main.go
+This will create a compiled filer with the name "main"
+We can now pass this compiled file to other developers to simply run it using : ./main
+If you want to run your program for testing before you compile it, you can test it via: go run main.go
+This will run the program.
