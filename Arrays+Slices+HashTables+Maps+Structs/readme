@@ -1,0 +1,96 @@
+################   ARRAYS   ######################
+Arrays in go are "Fixed" length of a "fixed" data types, unlike python lists. Arrays in go are automatically initialized with zero in the beginning.
+
+var x [5]int
+
+Above we have declare an array of 5 integers.
+
+To initialize an array with items: var x [5]int = [5]{1,2,3,4,5}
+
+
+
+To iterate through an array:
+
+x := [3]int {1,2,3}
+for i,v range x {
+  fmt.Printf("indexx %d, valuee %d", i,v)
+}
+
+
+################    SLICES    ######################
+It is window/piece of an array.
+You can increase/decrease size of a slice.
+
+arr := [...]string{"a","b","c","d","e"}
+slice1 := arr[1:3]     // This will be {"b","c"}
+slice2 := arr[2:4]     // This will be {"c",d"}
+
+
+len(slice1)   // This will be the length of slice which is 2 here
+cap(slice1)   // This will be the capacity of slice which is length of the array i.e. 5 here
+
+
+Changing values of a slice will actually change the underlying array. If we do slice[0] := "vani" it will change arr[1] to "vani"
+
+We can also initialize a new slice and it will also create an underlying array. Like so:
+sli := []int{1,2,3}
+
+
+Because of the flexibility in size that slice provides, we can always use slice instead of an array. Slice will however create an array in background which we can forget about :P
+Creating a slice will always create an array. make() is used for this.
+sli1 = make([]int,10)       // this will create a slice of 10 length and 10 capacity
+sli2 = make([]int,10,15)    // this will create a slice of 10 length and 15 capacity.
+
+
+append() is used to add elements to the end of slice if there is capacity left in the slice.
+sli1 = append(sl1,1000)    // this will add 1000 to the end of slice there by increasing the length of slice.
+
+
+
+################    HASH TABLES    ######################
+They contain key/value pairs. Each key should be unique. I think it looks like a dictionary in python so far :)
+Advantage is faster search and using meaningful keys.
+
+
+
+################    MAPS    ######################
+Map in the implementation of hash map. make() can be used to create a map.
+var mymap map[string]int    // here we declared a map with string type of keys and int type of values.
+
+mymap = make(map[string]int)   // here we are creating an empty map
+
+mymap := map[string]int {"Vani": 123}   // here we initialized the map
+
+mymap["Vani"] // this will return the value 123
+
+delete(mymap, "Vani") // here we deleted the key/value pair
+
+val, presence := mymap["Vani"]  // here val will get the value and presence is the boolean to know if the key is present.
+
+len(mymap) // this will return the length of the map
+
+
+Iterating over map:
+for key,value := range mymap {
+  fmt.Println(key,value)
+}
+
+
+################    STRUCTS    ######################
+It is like the structs in C. Mostly for organizing data.
+
+type struct Person {
+  name string
+  address string
+  phone string
+}
+
+var p1 Person
+var p2 Person
+
+p1.name = "joe"
+
+p2 := new(Person)
+
+p3 := Person(name: "Vani", address: "212 Street", phone: "123")
+
