@@ -1,0 +1,68 @@
+
+##################### JSON #####################
+Marshalling
+It means creating a json object from any go object.
+Example:
+
+#Lets define a Person struct
+type struct Person {
+  name string
+  address string
+  phone string
+}
+
+#Now lets create an object of this structre
+p1 := Person(name : "Vani", address : "AMK", phone : "123")
+
+# Now lets create a json object of p1 using Marshal(). The below will return a Json representation of byte array
+barr, err := json.Marshal(p1)
+
+Unmarshalling
+It is the reverse of marshalling. Takes input a json []byte and returns a go object.
+Example:
+var p2 Person
+err := json.Unmarshal(barr, &p2)
+
+Unmarshal() takes 2 inputs i.e. the []byte and the pointer to go object. The no. of fields of both barr and p2 should match/fit else unmarshalling isn't possible.
+
+
+##################### FILE OPERATIONS #####################
+Basic operations:
+Open()
+Read()
+Write()
+Close()
+Seek()
+
+
+######### ioutil #########
+
+io/ioutil is a commonly used package.
+data, e := ioutil.ReadFile("filename.txt")
+
+Using ioutil doesn't need us to open and close files. But the drawback is if the file is too large for your memory then ReadFile() can cause OOM problems since it read entire file in one go.
+
+Below example creates a file gives 077 permission to it.
+data = "Hi there!"
+err := ioutil.WriteFile("filename.txt", data, 077)
+
+
+######### os package #########
+os.Open()
+os.Close()
+os.Read()
+os.Write()
+
+f, err := os.Open("filename.txt")
+barr := make([]byte, 10)
+nb, err := f.Read(barr)
+f.Close()
+
+
+f, err := os.Create("filename.txt")
+barr := []byte{1,2,3}
+nb, err := f.Write(barr)
+nb, err := f.WriteString("Hi")
+
+
+
