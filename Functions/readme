@@ -1,0 +1,54 @@
+main() is called by default. It is a mandatory function.
+
+Functions are usefule for:
+reusability
+abstraction
+
+func foo (x int) int {    // this func takes an int as a parameter and return an int type of value
+ return x + 1
+}
+y := foo(1)
+
+
+We can also return multiple values in functions like so:
+func foo (x int) int int {
+ return x+1, x+2
+}
+a,b := foo(1)
+
+
+
+############### CALL BY VALUE ###############
+The examples above of func foo are called by value. This means function is called by value, i.e. only the value is passed and not an actual variable. Function foo has it's own copy of variable (x int). This is problematic if value of x is tooooo large then pass by refernece is better than creating copies of a laaaarge variable.
+
+
+
+############### CALL BY REFERENCE ###############
+Here the reference to the variable is passed and  any changes done to the passed variable actually alters the same variable since the address of it has been passed using pointers.
+
+func foo (x *int) {
+  *x = *x + 1
+}
+
+y := 2
+foo(&y)
+fmt.Print(y) // y will become 3
+
+This way you save time and space since you are not copying the variable. However since the function can now change the variables outside of it's scope, encapsulation of data gets defeated.
+
+
+
+
+############### PASSING SLICE ############### 
+func foo (x []int) int {
+  x[0] = x[0] + 1    // updated the actual array using references
+}
+
+a := []int{1,2,3}
+foo(a)
+
+
+
+
+
+
