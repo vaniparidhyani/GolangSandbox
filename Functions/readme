@@ -51,4 +51,112 @@ foo(a)
 
 
 
+############### FIRST CLASS VALUES ############### 
+functions in golang can be treated as a First Class Value which means it can be treated like any other data type like a string,int or float. This means we can set a variable to a function type. This way functions can be passed as arguments to other functions and can also be returned as values from other functions! That's new!
+
+Example of functions as variables:
+
+var funcVar func(int) int // this mean funcVar is a variable of type function which takes an integer input and returns an integer
+
+func foo(x int) int {
+	return x+1
+}
+
+func main(){
+	funcVar = foo // here we initialized funcVar with the function foo. Note foo is not being called here
+	fmt.Println(funcVar(2)) // here we called foo via funcVar
+}
+
+
+
+
+Example of functions as arguments:
+
+func foo(funcVar func(int) int, x int) int {   // here function foo takes 2 args. One is function type variable funcVar and other is integer type variable x and returns int
+	return funcVar(x) // here function variable is called which in turn will invoke whatever function it is initialized with
+}
+
+
+############### ANONYMOUS FUNCTIONS ###############
+Useful when you are just passing functions as variables and really no need to give them a name, they can be anonymous like so:
+
+func foo(funcVar func(int) int, x int) int {
+	return funcVar(x)
+}
+func main(){
+	v := foo(func (y int) int {return y+1}, 2)
+	fmt.Println(v)
+}
+
+
+
+
+
+
+
+
+############### FUNCTIONS AS RETURN VALUES ############### 
+Golang also allows to return functions from within functions! Like so:
+
+Below example finds the distance between two coordinates. The distance between origin coordinates (o_x,o_y) and destination coordinates (x,y)
+The below function takes origin coords as input args and returns a func which does the actual calculation. The returning func takes destination coords and returns distance.
+
+func MakeDistOrigin (o_x, o_y float64) func (float64, float64) float64 {
+	fn := func (x,y float64) float64 {
+		return math.Sqrt(math.Pow(x - o_x , 2) + mat.Pow(y - o_y , 2))
+		} 
+	return fn
+}
+
+func main(){
+	dist1 := MakeDistOrigin(0,0)
+	dist2 := MakeDistOrigin(2,2)
+	fmt.Println(dist1(2,2))     // this will find distance between 2,2 and 0,0
+	fmt.Println(dist2(2,2))     // this will fing distance between 2,2 and 2,2  So we see origin coords and dist coords are both variables using a single function
+}
+
+
+
+
+
+############### VARIABLE NO. OF ARGUMENTS ############### 
+Golang allows us to have variable no. of args passed to a function. Incase when the no. of args are dynamic, we can use 3 dots in args: ...
+Example:
+
+func getMax(vals ...int) int {   // here vals is a slice of integers of variable count
+	maxV := -1
+	for _,v := range vals {
+		if v > maxV {
+			maxV = v
+		}
+	}
+	return maxV
+}
+
+func main() {
+	vslice := []int{1233,3122,31234,2}
+	fmt.Println(getMax(vslice...))      // note that the 3 dots have to be passed when calling the func only then will it know that it is a variadic arg
+}
+
+
+
+
+
+
+############### DEFERRED FUNCTION CALLS ############### 
+Golang allows you to defer a call until the surrounding function completes. Mostly used for cleanup activities.
+
+func main() {
+	defer fmt.Println("Bye!")   // Bye! will be printed only after main() is complete.
+	fmt.Println("Hello!")
+}
+
+However args of a deferred call are evaluated immediately
+
+func main() {
+	i := 1
+	defer fmt.Println(i+1)   // this will print 2 after being deferred. So even though it will print at the end, it will evaluate before i++
+	i++
+	fmt.Println(i) // this will also print 2
+}
 
