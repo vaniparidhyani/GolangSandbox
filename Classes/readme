@@ -1,0 +1,126 @@
+Golang supports OOPs.
+
+Objects can created to instantiate a class.
+
+There is no class keyword in go however.. What ? Then how ?
+
+Example : Use a receiver type to associate Methods with Data
+
+type MyInt int    // here we created our own data type called MyInt
+
+func (mi MyInt) Double () int {   // here the function Double() only works with MyInt type of variables and 'mi' is a variable of type MyInt. The function returns an int
+  return int(mi*2)
+}
+
+func main() {
+  v := MyInt(3)   // v is an object of type MyInt and it's value is 3
+  fmt.Println(v.Double()) // here we call the function Double using the object v. Since Double() also works only on MyInt datatype and v is also MyInt datatype it'll work.
+}
+
+
+In the above example Double() is associated with MyInt data type. Even though it appears that it doesn't take any args directly,, it does take args indirectly via MyInt.
+
+
+
+
+Example: Commonly structs are associated with methods i.e. the receiver type is a struct
+
+type Point struct {
+	x float64
+	y float64
+}
+
+func (p Point) DistToOrig() int {
+  t := math.Pow(p.x,2) + math.Pow(p.y,2)
+  return math.Sqrt(t)
+}
+
+func main() {
+  p1 := Point(3,4)
+  fmt.Println(p1.DistToOrig())
+}
+
+
+
+
+##################### ENCAPSULATION #####################
+you can define a set of public functions, that allow external package, to access the hidden data. 
+
+Example:
+
+package data
+
+var x int = 1
+
+func PrintX(){      // functions which start with a capital letter can be exported. Go really loves camel casing it seems :P
+	fmt.Println(x)
+}
+
+
+Now we can import the "data" package above and access the variable x by using the function PrintX(), like so:
+
+package main
+import "data"
+func main(){
+	data.PrintX()   // that's how you call a function of an imported package
+}
+
+
+
+
+Example: Structs can also be defined in imported package with hidden data
+
+package mydata
+type Point struct {
+	x float64
+	y float64
+}
+
+func (p Point) InitMe(xn,yn float64) {
+	p.x = xn
+	p.y = yn
+}
+
+
+
+
+
+# now import it
+package main
+import "data"
+func main() {
+	var p data.Point
+	p.InitMe(3,54)
+}
+
+
+
+
+
+
+
+##################### POINTER  RECEIVERS ##################### 
+We've seen examples of how you import a package and then call it's public functions by passing arguments implicitly. Since this is a call by value, it will create a copy of the argument and then the function will work on the copy. The drawback of this call by value is: you cannot make changes to the original passed argument receiver and if the value of this argument receiver is large, it will waste space & time.
+
+So the solution is call be reference ofcourse!
+
+Example of POINTER RECEIVER:
+func (p *Point) Addition(v float64) {
+	p.x = p.x +v
+}
+
+
+In the above example you see p.x doesn't need dereferncing again. So no need to do *p.x = *p.x + v
+
+Sameway there is no need to do referencing: Example:
+
+func main() {
+	p := Point(3,4)
+	p.Addition(5)   // here we don't have to do &p.Addition(5). The referencing is done automatically. Only in func Addition you have to specify p as a pointer i.e *Point
+	fmt.Println(p.x) // here since it's call by ref, p.x actually changes
+}
+
+
+
+So when using pointer receivers it is good programming practice to either have all methods use pointer receivers, or have none of them use pointer receivers. It's just a good standard. It's easy to get confused. So if you have some methods, use pointer receivers and some not use pointer receivers It can get confusing. You'll send a pointer to the one that doesn't need a pointer and so on. So it's just more appropriate to use, it's good practice, you don't have to. You can mix and match if you want, but it's good practice to use all pointer references for a particular type or all non pointer references.
+
