@@ -1,0 +1,70 @@
+Interface is a set of methods signatures. 
+
+Starting straight with an example:
+
+Defining an interface
+
+type Shape2D interface { // All 2D shapes can have area() and perimeter() calculated. It doesn't do any actual calculation but just defines a 2DShape's abilities.
+	Area() float64 // float64 is for the return type of the function Area()
+	Perimeter() float64
+}
+
+type Triangle {...}
+
+func (t Triangle) Area() float64 {...} // Area() take Triangle as a receiver type 
+func (t Triangle) Perimeter() float64 {...} //Perimeter() also takes Triangle as receiver type. So Triangle is one such object that satisfies the Shape2D Interface signatures i.e. is accepted by the 2 funcs. Hence Go compiler will automatically match Triangle to the Interface.
+
+So if you see Interface is very much like a struct. Just definitions and no data. Struct is a collection of variables and their type, while Interface is a collection of functions and their return type.
+
+
+
+
+
+Now to define an interface type with some value we can do the below:
+
+type Speaker interface { //this is the interface
+	Speak()
+}
+
+type Doc struct {  //this is a Dynamic type in this case it's a struct
+	name string
+}
+
+func (d Dog) Speak(){ // Speak() func take Dog as receiver type
+	fmt.Println(d.name)
+}
+
+func main(){
+	var s1 Speaker // declared s1 as Speaker interface
+	var d1 Dog{"Rocky"} // declared d1 as Dog struct
+	s1 = d1 // Since Dog satisifes Speaker signatures this is possible. This way Speaker interface got it's dynamic value i.e. d1
+	s1.Speak() // this will print Rocky
+}
+
+
+############### Uses of an Interface ############### 
+When you don't want to harcode the types or count of arguments passed to the functions but only care about their return values then it's best to club them in an interface. For example is Shape2D interface Area() and Perimeter() can work on either int of float64 values or maybe string too.. It's doesn't matter like below:
+
+func CheckTheValues(s Shape2D) bool {
+	if ( s.Area() > 100 && s.Perimeter() > 100 {
+		fmt.Println("Big Enough!")
+	}
+	else {
+		fmt.Println("Too Small!")
+}
+
+
+Another use case is error interface. Example:
+
+We can handle errors using error interface.
+
+type error interface {
+	Error() string
+}
+
+f, err := os.Open("filename.txt")
+if err!= nil {
+	fmt.Println(err)
+	return 
+}
+
