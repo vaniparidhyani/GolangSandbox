@@ -1,0 +1,41 @@
+Parallelism is not concurrency.
+Parallelism is about running multiple tasks at the same time. Though you get better speed but you also need to provide that many resources to run tasks in parallel. A CPU core runs only one task at a time and with parallelism you will need n cores to run n tasks
+
+Concurrency comes into play when you have to maintain an order of tasks. So as soons as Task1 gets completed on Core1, Task2 is picked by the idle Core2. Meanwhile Core1 is free to pickup Task3. Things go hand in hand one after the other in a concurrent fashion!
+
+Now once utilization of CPU cores is optimized, next deadlock is memory. Caching helps to improve memory performance. Rather than depending on Main Memory, responses are served from Cache Memory.
+
+two tasks are concurrent if the start time and the end time of the tasks overlap.
+
+An OS performs processes concurrently. The switch between processes happens every 20ms in general. It happens so fast that we feel the processes are running in parallel even when they're not!
+Deciding which process runs at which time, that's called the scheduling task and operating systems do that.
+
+First-Come, First-Served (FCFS) Scheduling
+Shortest-Job-Next (SJN) Scheduling
+Priority Scheduling
+Shortest Remaining Time
+Round Robin(RR) Scheduling
+Multiple-Level Queues Scheduling
+
+Now, when the operating system moves from one process to another, when it starts a process running and then it starts another process running, that act of switching is called a context switch.
+
+So, when you do a context switch between two processes, that might take you a long time because there's a lot of context, this unique. But with two threads, when you go from one thread to the next in the same process, it's much faster, because there's less contexts, less data that you have to write to memory and read back from memory when you do a context switch. So, and now what happens in operating systems is that they instead of scheduling processes, they scheduled thread by thread.
+
+######################### GOROUTINES #########################
+Goroutines are basically a thread but in Go. Many Goroutines execute within a single operating system thread. 
+
+within Go, you can have multiple Goroutines that are executing within a main thread all alternating within that main thread.
+
+Go can start switching basically these Goroutines which are like threads inside the main thread. So, that process of doing the switching determining which Goroutine executing and what time, that scheduling process, that's done by the Go Runtime Scheduler.
+
+
+######################### INTERLEAVING #########################
+it's the order of tasks performed. It keeps varying in parallel programming and is hard to track, i.e. which task ran before which task.
+the interleaving, remember, is non-deterministic, it's determined by the operating system and the Go-runtime.
+
+
+######################### RACE CONDITIONS ######################### 
+So, a race condition is a problem that can happen as a result of all these possible interleaving that you have to consider.
+Whenever two concurrent tasks use a shared resource, there are chances of race condition and we must avoid it.
+
+
