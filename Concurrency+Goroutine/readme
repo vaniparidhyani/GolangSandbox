@@ -21,12 +21,21 @@ Now, when the operating system moves from one process to another, when it starts
 
 So, when you do a context switch between two processes, that might take you a long time because there's a lot of context, this unique. But with two threads, when you go from one thread to the next in the same process, it's much faster, because there's less contexts, less data that you have to write to memory and read back from memory when you do a context switch. So, and now what happens in operating systems is that they instead of scheduling processes, they scheduled thread by thread.
 
+
+
+
+
 ######################### GOROUTINES #########################
+
+
 Goroutines are basically a thread but in Go. Many Goroutines execute within a single operating system thread. 
 
 within Go, you can have multiple Goroutines that are executing within a main thread all alternating within that main thread.
 
 Go can start switching basically these Goroutines which are like threads inside the main thread. So, that process of doing the switching determining which Goroutine executing and what time, that scheduling process, that's done by the Go Runtime Scheduler.
+
+go func() // this is how a goroutine func is created by using the keyword go. The main() function is also a builtin goroutine. Important thing to note is if the main() goroutine completes it's execution then the other goroutines running within it will be forced to exit no matter if the child goroutines have finished their execution or not.
+
 
 
 ######################### INTERLEAVING #########################
@@ -36,6 +45,7 @@ the interleaving, remember, is non-deterministic, it's determined by the operati
 
 ######################### RACE CONDITIONS ######################### 
 So, a race condition is a problem that can happen as a result of all these possible interleaving that you have to consider.
-Whenever two concurrent tasks use a shared resource, there are chances of race condition and we must avoid it.
+Whenever two concurrent tasks use a shared resource, there are chances of race condition and we must avoid it. It can be checked like so : go run -race main.go
+This will show if there is a Data race.
 
 
