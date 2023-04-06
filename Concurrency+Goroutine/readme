@@ -49,3 +49,101 @@ Whenever two concurrent tasks use a shared resource, there are chances of race c
 This will show if there is a Data race.
 
 
+
+
+######################### SYCHRONIZATION ######################### 
+This is needed so we can order the interleavings based on some global event so that we can have DETERMINISTIC output.
+Example a task triggers a global event after it has done it's processing, and another task can run only once the global event has triggered. This way we can have some control over these tasks. But this is defeating concurrency, since the other task can't run until the global event is triggered. Like with concurrency, if a thread is ever waiting blocked waiting, then since the order doesn't matter, the scheduler can just move in another thread in the meantime while the first one's waiting. 
+
+So understand that every time we use synchronization, we are reducing the efficiency, we're reducing the amount of possible concurrency. So we're reducing the options for the scheduler so the scheduler won't be able to use the hardware as well as effectively. So there might be times when nothing can execute because we're waiting on the synchronization events. So in general, synchronization is bad because it reduces your performance and your efficiency in general but it is necessary for cases like this where you have to restrict the ordering.
+
+
+
+
+
+######################### WAIT GROUPS ######################### 
+This module is a part of sync package. (import sync)
+WaitGroups are useful for synchronization.
+sync.WaitGroup is a group of goroutines that your goroutine is waiting on. For your goroutine to run, all the goroutines in the WaitGroup should have finished execution.
+you can have one goroutine waiting on any no. of different goroutines and wait till they all complete.
+sync.WaitGroup uses a counter to do the waiting. If let's say you have to wait for 5 goroutines to finish, the sync.WaitGroup counter will be increased from 0 to 5 and then as each of these goroutines finish their execution the counter is decreased by 1. Once the counter is back to 0 value, the waiting is complete.
+There are methods like Add(), Done() and Wait() that help us achieve this waiting mechanism.
+Add() -> This increments the counter value by one. If the counter becomes zero, all goroutines blocked on Wait are released. If the counter goes negative, Add panics.
+Done() -> Done decrements the WaitGroup counter by one. The blocking goroutines call this method at the end of their code.
+Wait() -> Wait blocks until the WaitGroup counter is zero.
+
+
+It's up to the programmer to inject the Add, the Done in the Wait at the right places to make this whole mechanism work.
+
+
+
+
+
+Example:
+
+func foo(wg *sync.WaitGroup) {  // this is the goroutine I want to execute before main() goroutines finishes
+	fmt.Printf("New routine")
+	wg.Done()   // Done() signifies that foo() is done with it's execution
+}
+
+func main() {
+	var wg sync.WaitGroup  // initializing the WaitGroup
+	wg.Add(1)	// adding 1 to the counter since I want to wait for 1 goroutine i.e. foo()
+	go foo(&wg)	// here I call the goroutine foo() and pass pointer to WaitGroup variable
+	wg.Wait()	// here I Wait() until all goroutines are Done()
+	fmt.Printf("Main routine") // lastly this gets printed
+}
+
+
+
+
+
+######################### COMMUNICATION B/W GOROUTINES ######################### 
+Goroutines are generally layered out from a main program. The data between goroutines is often transferred and hence Go has Channels for this communication between goroutines.
+Channels are used to transfer data between goroutines and channels are typed. When you create a channel, you create it with a certain type.
+
+Example:
+channel1 := make(chan int) // this channel is used to transfer int type of data
+
+channel1 <- 3 // to send data to channel
+
+x := <- channel1 // to receive data from channel
+
+
+Example:
+func multiply(v1 int, v2 int, c chan int) {  // this takes 2 integer vars and 1 int type channel
+	c <- v1 * v2 // stores the result in channel
+}
+
+func main(){
+	c := make(chan int) // declare the channel
+	go multiply(1,2,c) // call the goroutine and pass the channel
+	go multiply(3,4,c) // call the goroutine and pass the channel
+	a := <- c // store the result from channel to a variable
+	b := <- c // store the result from channel to a variable
+	fmt.Println(a*b)
+}
+
+
+
+
+Now the above example of channel was when the data was not coming in transit. If the data is coming in transit to the channel, we need to buffer it.
+So the implications are that, since we don't want to lose data, the transmission or sending instruction has to block until the data is received on the receiving end, and the receiving instruction has to block until the data is sent.
+
+By default channels cannot hold data and there might be data loss in an unbuffered channel.
+
+
+
+
+
+
+
+######################### BUFFERRED CHANNELS ######################### 
+So by default, a channel is called Unbuffered. When you create a channel, it's unbuffered, and unbuffered channels cannot hold data in transit. 
+To make bufferred channels you need to give them some capacity to hold data. By default the capacity is zero.
+
+buff_chan := make(chan int,3) // this channel has a capacity of 3. So it will block the sender from the 4th send request since the buffer is full and at capacity.
+Receiver gets blocked if the buffer is empty. So it will block the 4th receive since it has only 3 items.
+
+Buffering is useful so that sender and receiver don't have to be in sync and the data can be stored in the buffer.
+
