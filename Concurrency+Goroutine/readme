@@ -209,6 +209,8 @@ func inc() {
 
 
 
+######################### ONCE ######################### 
+
 If you are running multiple goroutines of the same function and want some piece of code to be run only once no matter how many times it's called by goroutines.. you can use sync.Once
 
 Example:
@@ -233,3 +235,82 @@ func dostuff() {
 	fmt.Println("This will be called as many times the goroutine is called")
 	wg.Done() // finish the goroutine
 }
+
+
+
+######################### DEADLOCK ######################### 
+Times when 2 goroutines depend on each others execution, a deadlock can be faced. when you get into deadlock is when the dependencies are circular. 
+
+So, it can be caused by waiting on channels, it can also be caused by mutex, waiting on mutexes too, waiting for unlocking of mutex.
+golang runtime automatically detects a deadlock like how it automatically detects a race condition.
+However, the golang runtime cannot detect when only a subset of goroutines are deadlocked and hence only the programmer has to avoid it while coding.
+
+
+######################### DINNING PHILOSOPHERS PROBLEM ######################### 
+5 phils sitting at a round table
+each phil has a rice plate in front of them and 1 chopstick is placed on each side of the plate. It's not possible for all phils to eat together since there are only 5 chopsticks. 
+Each chopstick is a mutex.
+Each phil is associated with a goroutine and needs 2 chopsticks
+
+Code:
+
+type ChopS struct{
+	sync.Mutex
+}
+
+type Philo struct{
+	leftCS,rightCS *ChopS
+}
+
+func (p Philo) eat() {
+	for {
+		p.leftCS.Lock()
+		p.rightCS.Lock()
+		fmt.Println("eating")
+		p.leftCS.Unlock()
+                p.rightCS.Unlock()
+	}
+}
+
+func main(){
+
+	//initialize 5 chopsticks
+	CSticks := make([]*ChopS, 5)
+	for i:=0; i<5; i++ {
+		CSticks[i] = new(ChopS)
+	}
+
+	// initialize 5 philos and tell them their chopsticks to pick
+	philos := make([]*Philo, 5)
+	for i:=0; i<5; i++ { 
+                philos[i] = &Philo{CSticks[i], CSticks[(i+1)%5]}   // notice that the philo is getting leftCS and rightCS. rightCS is at (i+1)%5 position.
+	}
+
+	// now let's eat
+	for i:=0; i<5; i++ { 
+		go philos[i].eat()  // called the goroutine for each philo
+	}
+	
+}	
+
+So as to prevent the deadlock in this situation, we have to ask each philo to pick the lowest position of chopstick first.
+
+as per : 
+philos[i] = &Philo{CSticks[i], CSticks[(i+1)%5]} 
+
+philos[0] > CSticks[0], CSticks[5] // CSticks[0] is picked first
+philos[1] > CSticks[1], CSticks[2] // CSticks[1] is picked first
+philos[2] > CSticks[2], CSticks[3] // CSticks[2] is picked first
+philos[3] > CSticks[3], CSticks[4] // CSticks[3] is picked first
+philos[4] > CSticks[4], CSticks[0] // CSticks[0] is the lower number but can't be picked since philos[0] has already picked it.
+
+now except for philos[4] all have 1 chopstick on their left (the lower position one)
+Now since philos[4] is blocked and CSticks[4] is available, philos[3] can use it and now he has both the chopsticks
+
+Once philos[3] is done eating, the CSticks[3] can be picked by philos[2] and now he has both the chopsticks
+
+Once philos[2] is done eating, the CSticks[2] can be picked by philos[1] and now he has both the chopsticks
+
+One philos[1] is done eating, the CSticks[0] can be picked by philos[4] and CSticks[4] will already be available by then. Though philos[4] could only eat at the Last, we solved the eadlock situation but did ended up starving philos[4]. 
+
+So, starvation is another issue but deadlock is the worst.
