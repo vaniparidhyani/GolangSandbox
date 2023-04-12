@@ -147,3 +147,89 @@ Receiver gets blocked if the buffer is empty. So it will block the 4th receive s
 
 Buffering is useful so that sender and receiver don't have to be in sync and the data can be stored in the buffer.
 
+
+
+
+
+Iterating over a channel can be done with a range keyword on the for loop. But it becomes important now to close(c) otherwise the for loop will be infinite since it won't know if the data has stopped coming into the channel.
+
+for i := range c {
+	fmt.Println(i)
+}
+
+close(c)
+
+
+######################### SELECT ######################### 
+When you want to have the ability to choose from the multiple channels. You maybe want to go with FCFS for multiple channels.
+
+
+Example you dont want to wait for c1 or c2 but want to continue on availability case:
+
+select {
+	case a = <- c1:
+		fmt.Println(a)
+	case b = <- c2:
+		fmt.Println(b)
+}
+
+You can select on both sending and receiving the channels. Example:
+
+select {
+	case a = <- in_channel:
+		fmt.Println("Received a")
+	case out_channel <- b:
+		fmt.Println("Sent b")
+	case <- abort :    // you can stop executing once an abort signal is received on the "abort" channel
+		return
+	default:
+		fmt.Println("you can also have a default if nothing matches")
+}
+
+
+
+
+
+######################### MUTEX ######################### 
+ how we do sharing of data correctly between goroutines? Don't let two goroutines write to a shared variable at the same time, just as a rule of thumb. Don't let that happen because you can get these interleavings that are going to cause issues.
+Then you have to restrict their interleavings in such a way that you make sure that they can't both write to it at the same time. So, access to the shared variables cannot be interleaved. Mutex is used for this purpose.
+
+A Mutex ensure mutual exclusion via binary semaphores. lock() and unlock() are used.
+
+
+Example:
+
+var i int = 0
+var mut sync.Mutex
+func inc() {
+	mut.Lock() // so until unlock() is called no other goroutine can work on the global variable i
+	i += 1
+	mut.Unlock()
+}
+
+
+
+If you are running multiple goroutines of the same function and want some piece of code to be run only once no matter how many times it's called by goroutines.. you can use sync.Once
+
+Example:
+
+var wg sync.WaitGroup
+
+func main() {
+	wg.Add(2) // 2 goroutines
+	go dostuff() // called func
+	go dostuff() // called the same func again
+	wg.Wait() // wait for the goroutines to finish
+}
+
+var on sync.Once
+
+func setup() {
+	fmt.Println("Should be called only once")
+}
+
+func dostuff() {
+	on.Do(setup)  // setup() will be called but only once
+	fmt.Println("This will be called as many times the goroutine is called")
+	wg.Done() // finish the goroutine
+}
