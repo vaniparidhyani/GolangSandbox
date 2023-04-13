@@ -1,4 +1,7 @@
-///determine if a given word or phrase is an isogram. An isogram (also known as a "non-pattern word") is a word or phrase without a repeating letter.
+// WAP to create an acronym of the input string
+// Example: hi how are you -> HHAY
+// Example: I'm doing okay-ish -> IDOI
+// Example: Well that doesn't sound _ok_ -> WTDSO
 
 package main
 
