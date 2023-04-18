@@ -69,28 +69,3 @@ func ParseTrinary(s string) (int64, error) {
 	}
 	return count, err
 }
-
-func ParseTrinary1(s string) (int64, error) {
-	sp := strings.Split(s, "")
-	le := len(sp)
-	mid := le / 2
-	for i := 0; i < mid; i++ {
-		j := le - i - 1
-		sp[i], sp[j] = sp[j], sp[i]
-
-	}
-
-	var count float64
-	var val float64
-	count = 0
-	var err error
-	for k, v := range sp {
-		po := math.Pow(3.0, float64(k))
-		val, err = strconv.ParseFloat(v, 64)
-		if err == nil {
-			count += val * po
-		}
-	}
-	fmt.Println(count)
-	return int64(count), err
-}
