@@ -25,12 +25,17 @@ trinary_test.go:33: ParseTrinary("10") = 1, want 3
     trinary_test.go:33: ParseTrinary("0000000000000000000000000000000000000000201") = -9223372036854775808, want 19
     trinary_test.go:33: ParseTrinary("2021110011022210012102010021220101220221") = 7794616428515451904, want 9223372036854775807
     trinary_test.go:31: ParseTrinary("2021110011022210012102010021220101220222") = -9223372036854775808, <nil>, expected error
+
+--- FAIL: TestParseTrinary (0.00s)
+    trinary_test.go:33: ParseTrinary("2021110011022210012102010021220101220221") = -9223372036854775794, want 9223372036854775807
+    trinary_test.go:31: ParseTrinary("2021110011022210012102010021220101220222") = -9223372036854775793, <nil>, expected error
 */
 
 package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -49,23 +54,39 @@ func main() {
 	fmt.Println(ParseTrinary(line))
 }
 
+func IntPow(n, m int) int64 {
+	if m == 0 {
+		return 1
+	}
+	result := int64(n)
+	for i := 2; i <= m; i++ {
+		result *= int64(n)
+	}
+	return result
+}
+
 func ParseTrinary(s string) (int64, error) {
 	sp := strings.Split(s, "")
 	le := len(sp) - 1
-	var count int64
-	var val int64
-	count = 0
-	var err error
-
+	var count int64 = 0
+	var over = errors.New("integer overflow!")
+	var under = errors.New("integer underflow!")
 	for k := le; k >= 0; k-- {
 		v := sp[k]
-		po := int64(math.Pow(3, float64(le-k)))
-		val, err = strconv.ParseInt(v, 10, 64)
-		if err == nil {
-			count += val * po
-		} else {
-			fmt.Println(err)
+		po := IntPow(3, le-k)
+		val, _ := strconv.ParseInt(v, 10, 64)
+		count += val * po
+		if count < 0 {
+			if (count) <= (math.MinInt64) {
+				return 0, under
+			}
+		} else if (count) > 0 {
+			if (count) > (math.MaxInt64) {
+
+				return 0, over
+			}
 		}
 	}
-	return count, err
+
+	return count, nil
 }
